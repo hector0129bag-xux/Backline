@@ -2317,7 +2317,7 @@ function update(dt){
   const e=eyePos(),f=fwd();
   for(const id of ids()){if(id===myId||!views[id]||!players[id].alive)continue;const v=views[id],hp=[v.x,v.y+1.4,v.z];
     if(isEnemy(id)){const dd=norm(sub(hp,e));if(dot(dd,f)>Math.cos(55*DEG)&&losClear(e,hp))seen[id]={last:t};}
-    const vsp=Math.hypot(v.vx||0,v.vz||0);if(vsp>WALKS&&v.y-(views[id].y||0)<0.01){stepTs[id]=(stepTs[id]||0)-dt;if(stepTs[id]<=0){stepTs[id]=vsp>RUN+0.5?0.25:0.3;sfx('step',[v.x,0,v.z],vsp>RUN+0.5?0.9:0.7);}}}
+    const vsp=Math.hypot(v.vx||0,v.vz||0);if(vsp>WALKS&&v.y-(views[id].y||0)<0.01){stepTs[id]=(stepTs[id]||0)-dt;if(stepTs[id]<=0){stepTs[id]=vsp>RUN+0.5?0.2:0.29;sfx('step',[v.x,0,v.z],vsp>RUN+0.5?0.9:0.7);}}}
   if(state==='count'){countdown-=dt;const el=$('count');if(countdown>0){el.classList.remove('hidden');const n=String(Math.ceil(countdown));if(el.textContent!==n){el.textContent=n;el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');beep(520,.08);}}else{el.classList.add('hidden');state='play';banner('FIGHT!');beep(880,.15);}}
   const alive=mp&&mp.alive,canAct=state==='play'&&alive;
   // 移動
@@ -2360,7 +2360,7 @@ function update(dt){
   if(!mantle){const nx=PL.x+PL.vx*dt;if(!blocked(nx,PL.z,PR,PL.y))PL.x=nx;else PL.vx=0;
   const nz=PL.z+PL.vz*dt;if(!blocked(PL.x,nz,PR,PL.y))PL.z=nz;else PL.vz=0;}
   if(PL.ground){const g=groundAt(PL.x,PL.z,0.2,PL.y);if(g>=PL.y-STEP)PL.y=g;else PL.ground=false;}
-  if(PL.ground&&speedNow()>WALKS&&!crouch&&slideT<=0&&alive){stepT-=dt;if(stepT<=0){stepT=sprinting?0.25:0.31;sfx('step',null,0.32);}}else stepT=0.05;
+  if(PL.ground&&speedNow()>WALKS&&!crouch&&slideT<=0&&alive){stepT-=dt;if(stepT<=0){stepT=sprinting?0.2:0.29;sfx('step',null,0.32);}}else stepT=0.05;
   // 胸くらいまでの箱や高台は、前に進みながらジャンプでよじ登る
   if(mantle){mantle.t+=dt;const k=Math.min(1,mantle.t/mantle.dur),ky=ss(0,0.6,k),kx=ss(0.4,1,k),a=mantle.a,b=mantle.b;PL.x=a[0]+(b[0]-a[0])*kx;PL.z=a[2]+(b[2]-a[2])*kx;PL.y=a[1]+(b[1]-a[1])*ky;PL.vx=PL.vz=PL.vy=0;
     if(k>=1){PL.y=b[1];PL.ground=true;mantle=null;landAt=-1e9;}}
@@ -3287,16 +3287,19 @@ function xSpeedFx(dt,mp){const ok=mp&&mp.alive&&state==='play'&&!isCaster()&&!kc
   const air=ok&&!PL.ground&&speedNow()>RUN+0.6;const tgt=slid?1:run?0.6:air?0.45:0,cur=X.spdFx||0;X.spdFx=cur+(tgt-cur)*Math.min(1,dt*(tgt>cur?7:3.5));
   X.fovAdd=X.spdFx*(slid?13:9)*DEG;
   let roll=0;if(slid){const rx=Math.cos(yaw),rz=Math.sin(yaw),lat=slideDir[0]*rx+slideDir[1]*rz;roll=-0.03-lat*0.05;}
-  X.rollAdd=(X.rollAdd||0)+(roll-(X.rollAdd||0))*Math.min(1,dt*8);X.slideJit=slid?0.01*Math.min(1,slideT/0.3):0;xWind(X.spdFx);}
+  X.rollAdd=(X.rollAdd||0)+(roll-(X.rollAdd||0))*Math.min(1,dt*8);X.slideJit=slid?0.01*Math.min(1,slideT/0.3):0;}
 let windN=null;
 function xWind(k){const a=actx();if(!a||!A)return;if(!windN){if(k<0.02)return;const len=a.sampleRate*2,b=a.createBuffer(1,len,a.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<len;i++){last=last*0.97+(Math.random()*2-1)*0.03;d[i]=last*6;}
     const src=a.createBufferSource();src.buffer=b;src.loop=true;const f=a.createBiquadFilter();f.type='bandpass';f.Q.value=0.7;const g=a.createGain();g.gain.value=0;src.connect(f);f.connect(g);g.connect(A.sfxBus);src.start();windN={f,g};}
   const t=a.currentTime;windN.g.gain.setTargetAtTime(k*0.22,t,0.08);windN.f.frequency.setTargetAtTime(380+k*900,t,0.1);}
-function xSpeedLines(tn){const k=X.spdFx||0;if(k<0.04)return;const cx=W/2,cy=H/2,R=Math.hypot(W,H)/2;hx.save();
-  const g=hx.createRadialGradient(cx,cy,R*0.45,cx,cy,R);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(8,4,14,${0.32*k})`);hx.fillStyle=g;hx.fillRect(0,0,W,H);
-  hx.lineCap='round';for(let i=0;i<46;i++){const a=i*2.39996+(i%3)*0.11,ph=((tn*0.0016*(1+(i%5)*0.18)+i*0.137)%1),r0=R*(0.5+ph*0.55),len=(30+70*k)*(0.6+ph);
-    hx.strokeStyle=`rgba(255,255,255,${0.32*k*Math.sin(ph*Math.PI)})`;hx.lineWidth=1+((i%4)===0?1:0);hx.beginPath();hx.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);hx.lineTo(cx+Math.cos(a)*(r0+len),cy+Math.sin(a)*(r0+len));hx.stroke();}
-  hx.restore();}
+// 走り・スライディング中は画面の外側だけ流れるようにぼかす（縮小した画面を少し拡大して重ねるだけなので軽い）
+let BLC=null,BLX=null;
+function xSpeedLines(tn){const k=X.spdFx||0;if(k<0.04)return;const gc=gl&&gl.canvas;if(!gc)return;
+  const w=Math.max(2,Math.round(W/4)),h=Math.max(2,Math.round(H/4));if(!BLC){BLC=document.createElement('canvas');BLX=BLC.getContext('2d');}if(BLC.width!==w||BLC.height!==h){BLC.width=w;BLC.height=h;}
+  const b=BLX;b.globalCompositeOperation='source-over';b.globalAlpha=1;b.clearRect(0,0,w,h);try{b.drawImage(gc,0,0,w,h);}catch(e){return;}
+  for(const [z,al] of [[1.04,0.5],[1.09,0.35],[1.15,0.25]]){b.globalAlpha=al;b.drawImage(BLC,w*(1-z)/2,h*(1-z)/2,w*z,h*z);}
+  b.globalAlpha=1;b.globalCompositeOperation='destination-in';const g=b.createRadialGradient(w/2,h/2,Math.min(w,h)*0.22,w/2,h/2,Math.hypot(w,h)/2);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(0.7,`rgba(0,0,0,${Math.min(1,1.4*k)})`);g.addColorStop(1,`rgba(0,0,0,${Math.min(1,1.4*k)})`);b.fillStyle=g;b.fillRect(0,0,w,h);
+  hx.save();hx.imageSmoothingEnabled=true;hx.drawImage(BLC,0,0,W,H);hx.restore();}
 
 /* ---------- 一人称の腕：袖＝自分の色、手＝肌色などから選ぶ ---------- */
 const HANDCOL=[['#e9c4a2','肌（明るい）'],['#c99572','肌（中間）'],['#8d5b3e','肌（濃い）'],['#cdb68a','手袋（タン）'],['#66734a','手袋（オリーブ）'],['#e6e6e6','手袋（白）'],['#26262a','手袋（黒）']];
