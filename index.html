@@ -143,6 +143,9 @@ table.sb tr.th td{font-size:11px;font-weight:800;letter-spacing:.12em;border-top
 .card.good{border-left-color:var(--acc)}.card.good b{color:var(--acc)}
 .win{font-size:48px;font-weight:900;font-style:italic;letter-spacing:.14em;text-align:center;margin:4px 0;transform:skewX(-6deg)}
 .win.w{color:var(--acc);text-shadow:0 0 28px rgba(255,122,47,.5)}.win.l{color:var(--hot);text-shadow:0 0 28px rgba(255,70,85,.45)}
+.kbgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 18px}.kbcol{min-width:0}.kbh{font-size:11px;font-weight:800;letter-spacing:.2em;color:#a898b8;margin:4px 0 4px;border-bottom:1px solid #3b2a4a;padding-bottom:3px}.kbrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 4px;border-radius:4px;flex-wrap:wrap}.kbrow:hover{background:rgba(139,77,255,.07)}.kbrow span{font-size:12px;line-height:1.25;flex:1;min-width:0}.kbrow .smallbtn{min-width:86px;padding:4px 8px;font-size:12px}.kbrow.cap{background:rgba(255,122,47,.12)}.kbw{display:flex;gap:4px;width:100%;justify-content:flex-end;font-style:normal}.kbw button{font-size:11px;padding:3px 7px}#keysPanel .panel{max-width:1180px;width:min(1180px,96vw)}@media (orientation:portrait){.kbgrid{grid-template-columns:1fr 1fr}}
+#keysPanel .panel{max-width:1180px;width:min(1180px,96vw)}#keysPanel .kbopts{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+@media (orientation:portrait){.kbgrid{grid-template-columns:1fr}#keysPanel .kbopts{grid-template-columns:1fr}}
 .keys{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13px;background:#150e1c;border-radius:8px;padding:12px}
 #help .panel{max-width:1100px;width:min(1100px,96vw)}@media (orientation:landscape){#help .keys{grid-template-columns:auto 1fr auto 1fr}}
 .keys b{color:#ffd166}
@@ -380,15 +383,16 @@ input:focus{border-color:#8b4dff}
 <!-- キー設定 -->
 <div id="keysPanel" class="overlay hidden"><div class="panel">
   <h1>キー設定</h1>
-  <div class="sub">変えたい操作のボタンを押してから、割り当てたいキーを押してください（Escでキャンセル）。マウスのホイールクリックとサイドボタン（戻る・進む）も使えます。射撃は左クリック、ADSは右クリック固定です。</div>
-  <div id="kbList"></div>
+  <div class="sub">変えたい操作のボタンを押してから、割り当てたいキーを押してください（Escでキャンセル）。マウスのホイールクリック・サイドボタン（戻る・進む）・ホイール↑↓も使えます（入力待ち中にホイールを回すか、出てくる「ホイール↑／↓」ボタンを押す）（ホイールに何も割り当てなければ武器の持ち替え）。射撃は左クリック、ADSは右クリック固定です。</div>
+  <div id="kbList" class="kbgrid"></div>
   <h2>動きのオプション</h2>
+  <div class="kbopts">
   <div class="row"><span>自動ダッシュ（前進すると常にダッシュ）</span><div class="seg" data-o="autoSprint"><button data-v="1">ON</button><button data-v="0">OFF</button></div></div>
   <div class="row"><span>ダッシュ</span><div class="seg" data-o="sprintToggle"><button data-v="0">押している間</button><button data-v="1">切り替え</button></div></div>
   <div class="row"><span>しゃがみ</span><div class="seg" data-o="crouchToggle"><button data-v="0">押している間</button><button data-v="1">切り替え</button></div></div>
   <div class="row"><span>ADS（右クリック）</span><div class="seg" data-o="adsToggle"><button data-v="0">押している間</button><button data-v="1">切り替え</button></div></div>
-  <button class="go sec" id="kbReset">初期設定に戻す</button>
-  <button class="go" id="kbDone">完了</button>
+  </div>
+  <div style="display:flex;gap:10px"><button class="go sec" id="kbReset" style="flex:1">初期設定に戻す</button><button class="go" id="kbDone" style="flex:2">完了</button></div>
 </div></div>
 
 <!-- クロスヘア -->
@@ -420,7 +424,7 @@ input:focus{border-color:#8b4dff}
     <b>C</b><span>しゃがみ／ダッシュ中ならスライディング</span><b>Space</b><span>ジャンプ</span>
     <b>左クリック</b><span>射撃</span><b>右クリック長押し</b><span>覗き込み（ADS）。スナイパーはスコープ</span>
     <b>R</b><span>リロード</span><b>Tab長押し</b><span>スコアボード</span>
-    <b>1〜5</b><span>保存したロードアウトを選ぶ（訓練場では1〜9でメイン武器）（復活直後5秒以内なら即持ち替え、それ以外は次の復活から）</span><b>Enter</b><span>チャット（Enterで送信）</span><b>Q／E</b><span>左右に覗く（体を傾けて角から少しだけ顔を出す）</span><b>ホイールクリック</b><span>ピン（敵を狙って押すと「敵」、それ以外は「ここ」の印を味方に出す）</span><b>ジャンプ（前進中）</b><span>胸の高さくらいまでの箱や高台によじ登る</span><b>X／ホイール</b><span>メイン／サブ武器の持ち替え</span><b>しゃがみ</b><span>走っている時に押すと、動いている方向へスライディング（ダッシュ中はより速く長い）</span><b>バニーホップ</b><span>スライディング中にジャンプすると勢いを持ったまま跳べる。ジャンプ押しっぱなしで着地と同時に跳び直し、空中で横移動キー＋視点を回すと加速（最高13m/秒）</span><b>ホイール／T</b><span>メイン→サブ→ナイフの順に持ち替え（Tでナイフだけを持つ。ナイフ中は足が少し速く、左クリックで切る）</span><b>V</b><span>ナイフ攻撃（目の前2.4m以内なら一撃）</span><b>F</b><span>武器を眺める（もう一度押すとナイフ）</span><b>G</b><span>フラッシュを持つ → 右クリックで構える（飛ぶ道筋が見える）→ 左クリックで投げる（1回の命で2個。見ている方向で爆発すると画面が真っ白になる）</span><b>M</b><span>全体マップ</span><b>Esc</b><span>一時停止（試合は止まりません）</span>
+    <b>1〜5</b><span>保存したロードアウトを選ぶ（訓練場では1〜9でメイン武器）（復活直後5秒以内なら即持ち替え、それ以外は次の復活から）</span><b>Enter</b><span>チャット（Enterで送信）</span><b>Q／E</b><span>左右に覗く（体を傾けて角から少しだけ顔を出す）</span><b>ホイールクリック</b><span>ピン（敵を狙って押すと「敵」、それ以外は「ここ」の印を味方に出す）</span><b>ジャンプ（前進中）</b><span>胸の高さくらいまでの箱や高台によじ登る</span><b>X／ホイール</b><span>メイン／サブ武器の持ち替え</span><b>しゃがみ</b><span>走っている時に押すと、動いている方向へスライディング（ダッシュ中はより速く長い）</span><b>バニーホップ</b><span>スライディング中にジャンプすると勢いを持ったまま跳べる。ジャンプ押しっぱなしで着地と同時に跳び直し、空中で横移動キー＋視点を回すと加速（最高13m/秒）</span><b>ホイール／T</b><span>メイン→サブ→ナイフの順に持ち替え（Tでナイフだけを持つ。ナイフ中は足が少し速く、左クリックで切る）</span><b>V</b><span>ナイフ攻撃（目の前2.4m以内なら一撃）</span><b>F</b><span>武器を眺める（もう一度押すとナイフ）</span><b>G</b><span>投げ物を持つ（押すたびに種類を切り替え）→ 左クリック長押しで遠くへ投げる／右クリック長押しで近くに転がす（押している間は飛ぶ道筋が見え、離すと投げる）</span><b>M</b><span>全体マップ</span><b>Esc</b><span>一時停止（試合は止まりません）</span>
   </div>
   <div class="note"><b>追加のキー</b>：F＝武器を拾う／爆弾の設置・解除／味方の蘇生（長押し）　B＝購入（爆破の購入時間）　G＝投げ物（押すたびにフラッシュ→スモーク→火炎瓶）　N＝空爆（7キル）　H＝スプレー　Z＝残弾チェック　Y＝眺める<br>
   <b>キルストリーク</b>：3キル＝UAV（敵がミニマップに映る）　5キル＝レーダー妨害（敵のミニマップを止める）　7キル＝空爆<br>
@@ -481,12 +485,12 @@ let ACC_OV=null;
 const saveS=()=>store.set('aimrange_settings',S),saveA=()=>store.set('backline_settings',AS);
 // キー設定（Ctrlはブラウザのショートカットと衝突するので使わない）
 const KB_DEF={fwd:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD',sprint:'ShiftLeft',walk:'AltLeft',crouch:'KeyC',jump:'Space',reload:'KeyR',board:'Tab',w1:'Digit1',w2:'Digit2',w3:'Digit3',w4:'Digit4',w5:'Digit5',w6:'Digit6',w7:'Digit7',w8:'Digit8',w9:'Digit9',knife:'KeyT',melee:'KeyV',inspect:'KeyY',use:'KeyF',buy:'KeyB',ks:'KeyN',spray:'KeyH',chk:'KeyZ',swap:'KeyX',leanL:'KeyQ',leanR:'KeyE',ping:'Mouse1',flash:'KeyG',map:'KeyM'};
-const KB_LABEL={fwd:'前進',back:'後退',left:'左',right:'右',sprint:'ダッシュ',walk:'歩く（押している間・足音が鳴らない）',crouch:'しゃがみ／スライディング',jump:'ジャンプ',reload:'リロード',board:'スコアボード',w1:'武器1（ライフル）',w2:'武器2（SMG）',w3:'武器3（ショットガン）',w4:'武器4（スナイパー）',w5:'武器5（マークスマン）',w6:'武器6（ヘビーMG）',w7:'武器7（バースト）',w8:'武器8（ダブルバレル）',w9:'武器9（バトルライフル）',knife:'ナイフに持ち替え',melee:'ナイフ攻撃',inspect:'眺める（2回でナイフ）',use:'拾う／設置・解除／蘇生（長押し）',buy:'購入メニュー（爆破）',ks:'空爆を呼ぶ',spray:'スプレー',chk:'残弾チェック',leanL:'左に覗く',leanR:'右に覗く',ping:'ピン（敵・場所を味方に知らせる）',swap:'メイン／サブ持ち替え',flash:'投げ物を持つ（押すたびに切り替え）',map:'全体マップ'};
+const KB_LABEL={fwd:'前進',back:'後退',left:'左',right:'右',sprint:'ダッシュ',walk:'歩く（押している間・足音が鳴らない）',crouch:'しゃがみ／スライディング',jump:'ジャンプ',reload:'リロード',board:'スコアボード',w1:'ロードアウト1',w2:'ロードアウト2',w3:'ロードアウト3',w4:'ロードアウト4',w5:'ロードアウト5',w6:'訓練場の武器6',w7:'訓練場の武器7',w8:'訓練場の武器8',w9:'訓練場の武器9',knife:'ナイフに持ち替え',melee:'ナイフ攻撃',inspect:'眺める（2回でナイフ）',use:'拾う／設置・解除／蘇生（長押し）',buy:'購入メニュー（爆破）',ks:'空爆を呼ぶ',spray:'スプレー',chk:'残弾チェック',leanL:'左に覗く',leanR:'右に覗く',ping:'ピン（敵・場所を味方に知らせる）',swap:'メイン／サブ持ち替え',flash:'投げ物を持つ（押すたびに切り替え）',map:'全体マップ'};
 if(AS.keys&&AS.keys.swap==='KeyQ'&&!AS.keys.leanL){AS.keys.swap='KeyX';} // 以前の設定から移行（Qは覗きに）
 const KB=Object.assign({},KB_DEF,AS.keys||{});
 const OPT=Object.assign({autoSprint:false,sprintToggle:false,crouchToggle:false,adsToggle:false},AS.opts||{});
 const kd=a=>!!keys[KB[a]]||(typeof VI!=='undefined'&&!!VI.k[a]);
-const keyName=c=>c==='Mouse1'?'ホイールクリック':c==='Mouse3'?'マウス戻る':c==='Mouse4'?'マウス進む':c?c.replace(/^Key/,'').replace(/^Digit/,'').replace('ShiftLeft','左Shift').replace('ShiftRight','右Shift').replace('AltLeft','左Alt').replace('Space','Space').replace('CapsLock','CapsLock'):'-';
+const keyName=c=>c==='WheelUp'?'ホイール↑':c==='WheelDown'?'ホイール↓':c==='Mouse1'?'ホイールクリック':c==='Mouse3'?'マウス戻る':c==='Mouse4'?'マウス進む':c?c.replace(/^Key/,'').replace(/^Digit/,'').replace('ShiftLeft','左Shift').replace('ShiftRight','右Shift').replace('AltLeft','左Alt').replace('Space','Space').replace('CapsLock','CapsLock'):'-';
 let sprintOn=false,crouchOn=false,capturing=null;
 
 /* ---------- クロスヘア ---------- */
@@ -2132,8 +2136,14 @@ $('charDone').onclick=()=>{AS.name=$('myName').value.trim().slice(0,14)||('Playe
 $('mSet').onclick=()=>{backTo='home';refreshSet();show('settings');};$('pauseSet').onclick=()=>{backTo='pause';refreshSet();show('settings');};
 $('setDone').onclick=()=>show(backTo);
 function renderKeys(){
-  $('kbList').innerHTML=Object.keys(KB_DEF).map(a=>`<div class="row"><span>${KB_LABEL[a]}</span><button class="smallbtn" data-a="${a}" style="min-width:110px">${capturing===a?'キーを押して…':keyName(KB[a])}</button></div>`).join('');
-  $('kbList').querySelectorAll('button').forEach(b=>b.onclick=()=>{capturing=b.dataset.a;renderKeys();});
+  // 種類ごとにまとめて横に並べる（縦に長くならないように）
+  const G=[['移動',['fwd','back','left','right','sprint','walk','crouch','jump','leanL','leanR']],['戦闘',['reload','swap','knife','melee','flash','inspect','chk','ping']],
+    ['ロードアウト',['w1','w2','w3','w4','w5','w6','w7','w8','w9']],['その他',['use','buy','ks','spray','board','map']]],used=new Set(G.flatMap(g=>g[1]));
+  const rest=Object.keys(KB_DEF).filter(a=>!used.has(a));if(rest.length)G[3][1].push(...rest);
+  $('kbList').innerHTML=G.map(([t,list])=>`<div class="kbcol"><div class="kbh">${t}</div>${list.map(a=>`<div class="kbrow${capturing===a?' cap':''}"><span>${KB_LABEL[a]||a}</span><button class="smallbtn" data-a="${a}">${capturing===a?'入力待ち…':keyName(KB[a])}</button>${capturing===a?'<i class="kbw"><button class="smallbtn" data-wh="WheelUp">ホイール↑</button><button class="smallbtn" data-wh="WheelDown">ホイール↓</button></i>':''}</div>`).join('')}</div>`).join('');
+  $('kbList').querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{capturing=b.dataset.a;renderKeys();});
+  // ホイール↑↓はボタンでも割り当てられる（トラックパッドで回しにくい時用）
+  $('kbList').querySelectorAll('button[data-wh]').forEach(b=>b.onclick=e=>{e.stopPropagation();const code=b.dataset.wh;for(const a in KB)if(KB[a]===code&&a!==capturing)KB[a]=KB[capturing];KB[capturing]=code;AS.keys=Object.assign({},KB);saveA();capturing=null;renderKeys();});
   $('keysPanel').querySelectorAll('[data-o]').forEach(sg=>sg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===!!OPT[sg.dataset.o]);b.onclick=()=>{OPT[sg.dataset.o]=b.dataset.v==='1';AS.opts=OPT;saveA();renderKeys();};}));
 }
 $('openKeys').onclick=()=>{capturing=null;renderKeys();show('keysPanel');};
@@ -2142,6 +2152,8 @@ $('kbReset').onclick=()=>{Object.assign(KB,KB_DEF);AS.keys=Object.assign({},KB);
 // キー設定中：マウスのホイールクリック・サイドボタンも割り当てられる
 addEventListener('mousedown',e=>{if(!capturing||![1,3,4].includes(e.button))return;e.preventDefault();e.stopImmediatePropagation();const code='Mouse'+e.button;
   for(const a in KB)if(KB[a]===code&&a!==capturing)KB[a]=KB[capturing];KB[capturing]=code;AS.keys=Object.assign({},KB);saveA();capturing=null;renderKeys();},true);
+addEventListener('wheel',e=>{if(!capturing||Math.abs(e.deltaY)<4)return;e.preventDefault();e.stopImmediatePropagation();const code=e.deltaY<0?'WheelUp':'WheelDown';
+  for(const a in KB)if(KB[a]===code&&a!==capturing)KB[a]=KB[capturing];KB[capturing]=code;AS.keys=Object.assign({},KB);saveA();capturing=null;renderKeys();},{capture:true,passive:false});
 addEventListener('keydown',e=>{if(!capturing)return;e.preventDefault();e.stopImmediatePropagation();
   if(e.code!=='Escape'&&!/^Control|^Meta/.test(e.code)){for(const a in KB)if(KB[a]===e.code&&a!==capturing)KB[a]=KB[capturing];KB[capturing]=e.code;AS.keys=Object.assign({},KB);saveA();}
   capturing=null;renderKeys();},true);$('openX').onclick=()=>{show('xhair');refreshX();};$('xDone').onclick=()=>{refreshSet();show('settings');};
@@ -2293,14 +2305,18 @@ document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockEl
   else if(state==='play'){state='pause';$('pauseRestart').classList.toggle('hidden',!(solo||(isHost&&connected)));$('pauseRoom').classList.toggle('hidden',!(isHost&&connected&&!solo));show('pause');for(const k in keys)keys[k]=false;mouseDown=false;adsHeld=false;}});
 document.addEventListener('pointerlockerror',()=>{$('pmsg').textContent='1秒ほど待ってからもう一度「戻る」を押してね';});
 $('resume').onclick=()=>lockPointer();
-addEventListener('wheel',e=>{if(locked&&state==='play'&&Math.abs(e.deltaY)>10)wheelSwap(e.deltaY);},{passive:true});
+// ホイール：↑↓に割り当てた操作があればそれを実行（ジャンプなどは一瞬押した扱い）、なければ武器の持ち替え
+let wheelAt=0;addEventListener('wheel',e=>{if(capturing||!locked||(state!=='play'&&state!=='count')||Math.abs(e.deltaY)<4)return;const code=e.deltaY<0?'WheelUp':'WheelDown';
+  if(Object.values(KB).includes(code)){keys[code]=true;gameKey({code,repeat:false,preventDefault(){}});clearTimeout(keys['_t'+code]);keys['_t'+code]=setTimeout(()=>{keys[code]=false;if(code===KB.board)boardHeld=false;},90);return;}
+  if(state==='play'&&Math.abs(e.deltaY)>10&&now()-wheelAt>90){wheelAt=now();wheelSwap(e.deltaY);}},{passive:true});
 document.addEventListener('mousemove',e=>{if(!locked||(state!=='play'&&state!=='count'))return;const W0=W_(),zoom=1-adsK*(1-Math.tan(W0.fov*DEG/2)/Math.tan(FOVH/2));const k=0.07*S.sens*DEG*zoom*(1-adsK+adsK*(AS.adsMul||1));yaw+=e.movementX*k;pitch-=e.movementY*k;pitch=Math.max(-89*DEG,Math.min(89*DEG,pitch));});
 function canFireNow(){const p=me();return !xBlockFire()&&curW!=='knife'&&!mantle&&!flashHeld&&now()>=swapT&&burstQ<=0&&state==='play'&&locked&&p&&p.alive&&now()-lastShot>=1000/W_().rpm&&!sprinting&&now()-sprintEnd>=SPRINT_TO_FIRE;}
 function onDown(e){if(!locked&&(state==='play'||state==='count')){lockPointer();return;}
   if(holding==='k'&&curW==='knife'){if(e.button===0)meleeAttack();return;}
-  if(flashHeld){if(e.button===2){adsHeld=OPT.adsToggle?!adsHeld:true;return;}if(e.button===0){if(adsHeld){throwFlash();adsHeld=false;}else feed('右クリックで構えてから投げる','n');}return;}if(e.button===2){adsHeld=OPT.adsToggle?!adsHeld:true;return;}if(e.button!==0)return;mouseDown=true;if(canFireNow())fire();}
+  if(flashHeld){if(e.button===0)nadeAim='far';else if(e.button===2)nadeAim='near';return;}if(e.button===2){adsHeld=OPT.adsToggle?!adsHeld:true;return;}if(e.button!==0)return;mouseDown=true;if(canFireNow())fire();}
 cv.addEventListener('mousedown',onDown);hud.addEventListener('mousedown',onDown);
-addEventListener('mouseup',e=>{if(e.button===0)mouseDown=false;if(e.button===2&&!OPT.adsToggle)adsHeld=false;});
+function nadeRelease(btn){if(flashHeld&&nadeAim&&((btn===0&&nadeAim==='far')||(btn===2&&nadeAim==='near')))throwFlash(nadeAim);}
+addEventListener('mouseup',e=>{nadeRelease(e.button);if(e.button===0)mouseDown=false;if(e.button===2&&!OPT.adsToggle)adsHeld=false;});
 addEventListener('contextmenu',e=>{if(state==='play'||state==='count'||state==='pause')e.preventDefault();});
 function gameKey(e){
   if(state==='play'||state==='count'){if(e.code===KB.ping&&!e.repeat)doPing();if(e.code===KB.melee&&!e.repeat)meleeAttack();if(e.code===KB.inspect&&!e.repeat)startInspect();if(e.code===KB.reload){if(flashHeld){flashHeld=false;swapT=now()+250;}else startReload();}if(e.code===KB.flash&&!e.repeat)xToggleNade();if(e.code===KB.map&&!e.repeat)mapOpen=!mapOpen;if(e.code===KB.board){boardHeld=true;e.preventDefault();}
@@ -2427,12 +2443,16 @@ function toggleFlash(){
   if(flashHeld){flashHeld=false;swapT=now()+250;return;}
   if(flashes<=0){feed('フラッシュがもうない','n');return;}
   flashHeld=true;reloading=0;burstQ=0;swapT=now()+250;mouseDown=false;
-  if(!AS.flashTip){AS.flashTip=1;saveA();feed('右クリックで構えて、左クリックで投げる','n');}
+  if(!AS.flashTip2){AS.flashTip2=1;saveA();feed('左クリック＝遠くへ投げる／右クリック＝近くに転がす（離すと投げる）','n');}
 }
-function flashLaunch(){const e=eyePos(),f=fwd();return {o:[e[0]+f[0]*0.4,e[1]-0.1,e[2]+f[2]*0.4],v:[f[0]*15+PL.vx*0.5,f[1]*15+3.2,f[2]*15+PL.vz*0.5]};}
-function throwFlash(){
+// 投げ物：far＝上手投げで遠くへ、near＝下手投げで足元近くへ転がす
+let nadeAim=null;
+function flashLaunch(mode){const e=eyePos(),f=fwd();if(mode==='near'){const h=Math.hypot(f[0],f[2])||1,fy=Math.max(-0.5,Math.min(0.5,f[1]));
+    return {o:[e[0]+f[0]*0.35,e[1]-0.75,e[2]+f[2]*0.35],v:[f[0]/h*6.2+PL.vx*0.5,fy*5+1.6,f[2]/h*6.2+PL.vz*0.5]};}
+  return {o:[e[0]+f[0]*0.4,e[1]-0.1,e[2]+f[2]*0.4],v:[f[0]*15+PL.vx*0.5,f[1]*15+3.2,f[2]*15+PL.vz*0.5]};}
+function throwFlash(mode){
   const p=me();if(state!=='play'||!p||!p.alive||xNadeCount(X.nadeK)<=0||now()-lastThrow<600||!flashHeld||now()<swapT)return;
-  lastThrow=now();xUseNade();flashHeld=false;swapT=now()+350;const L=flashLaunch(),o=L.o,v=L.v;
+  lastThrow=now();xUseNade();flashHeld=false;nadeAim=null;swapT=now()+350;const L=flashLaunch(mode),o=L.o,v=L.v;
   const m={t:'nade',id:myId,o:o.map(r3),v:v.map(r3),k:X.nadeK};share(m,true);spawnNade(m);beep(300,.05,'triangle',.05);
 }
 function spawnNade(m){nades.push({x:m.o[0],y:m.o[1],z:m.o[2],vx:m.v[0],vy:m.v[1],vz:m.v[2],t:0,owner:m.id,k:m.k||'flash'});}
@@ -2925,7 +2945,7 @@ function render2d(){
     hx.save();hx.globalAlpha=a;hx.translate(s2[0],s2[1]-14);hx.fillStyle='rgba(10,16,22,.7)';hx.beginPath();hx.moveTo(0,-11);hx.lineTo(10,0);hx.lineTo(0,11);hx.lineTo(-10,0);hx.closePath();hx.fill();
     hx.strokeStyle=col;hx.lineWidth=2;hx.stroke();hx.fillStyle=col;hx.font='900 11px system-ui,sans-serif';hx.textAlign='center';hx.fillText(q.k==='enemy'?'!':'▼',0,4);
     hx.font='700 10px system-ui,sans-serif';hx.fillStyle='rgba(236,232,225,.9)';hx.fillText((pp?pp.name:'')+' '+Math.round(d)+'m',0,24);hx.restore();}
-  if(flashHeld&&adsHeld&&mp&&mp.alive&&now()>=swapT){const L=flashLaunch(),n={x:L.o[0],y:L.o[1],z:L.o[2],vx:L.v[0],vy:L.v[1],vz:L.v[2]},h=1/60;let last=null;
+  if(flashHeld&&nadeAim&&mp&&mp.alive&&now()>=swapT){const L=flashLaunch(nadeAim),n={x:L.o[0],y:L.o[1],z:L.o[2],vx:L.v[0],vy:L.v[1],vz:L.v[2]},h=1/60;let last=null;
     hx.fillStyle='rgba(255,255,255,.75)';
     for(let i=0;i<66;i++){n.vy-=GRAV*h;const nx=n.x+n.vx*h;if(nadeHit(nx,n.z,n.y)){n.vx*=-0.45;n.vz*=0.8;}else n.x=nx;const nz=n.z+n.vz*h;if(nadeHit(n.x,nz,n.y)){n.vz*=-0.45;n.vx*=0.8;}else n.z=nz;
       n.y+=n.vy*h;const g=groundAt(n.x,n.z,0.05,n.y+0.1);if(n.y<=g){n.y=g;if(n.vy<0)n.vy=-n.vy*0.3;n.vx*=0.7;n.vz*=0.7;}
@@ -3042,8 +3062,8 @@ function virtLock(){locked=true;if(state==='pause'){state='play';show(null);}}
 function goPause(){if(state!=='play')return;locked=false;state='pause';$('pauseRestart').classList.toggle('hidden',!(solo||(isHost&&connected)));$('pauseRoom').classList.toggle('hidden',!(isHost&&connected&&!solo));show('pause');
   for(const k in keys)keys[k]=false;for(const k in VI.k)VI.k[k]=false;mouseDown=false;adsHeld=false;VI.mx=VI.mz=VI.amag=0;}
 function lookBy(dx,dy){const W0=W_(),zoom=1-adsK*(1-Math.tan(W0.fov*DEG/2)/Math.tan(FOVH/2)),k=zoom*(1-adsK+adsK*(AS.adsMul||1));yaw+=dx*k;pitch-=dy*k;pitch=Math.max(-89*DEG,Math.min(89*DEG,pitch));}
-function vFire(on){if(on){if(!locked&&(state==='play'||state==='count'))virtLock();onDown({button:0});}else mouseDown=false;}
-function vAds(on){if(flashHeld){adsHeld=on;return;}if(OPT.adsToggle){if(on)adsHeld=!adsHeld;}else adsHeld=on;}
+function vFire(on){if(on){if(!locked&&(state==='play'||state==='count'))virtLock();onDown({button:0});}else{nadeRelease(0);mouseDown=false;}}
+function vAds(on){if(flashHeld||nadeAim==='near'){if(on)onDown({button:2});else nadeRelease(2);return;}if(OPT.adsToggle){if(on)adsHeld=!adsHeld;}else adsHeld=on;}
 
 /* ===== コントローラー ===== */
 addEventListener('gamepadconnected',e=>{PAD.on=true;PAD.idx=e.gamepad?e.gamepad.index:0;feed('コントローラーを認識した','n');});
@@ -3743,7 +3763,7 @@ const TUT=[
   {t:'止まって撃つ',d:'FPSの基本：動きながら撃つと弾がブレる。キーを離して止まった瞬間に撃とう（3発）',ok:s=>s.still>=3,tip:'どのFPSでも通じる「カウンターストレイフ」の基礎'},
   {t:'リロード',d:'Rでリロード。弾が切れる前に安全な所で',ok:s=>s.reload>0},
   {t:'持ち替え',d:'X（またはホイール）でサブ武器、Tで近接武器。全部持ってみよう',ok:s=>s.wset.size>=3},
-  {t:'投げ物',d:'Gで持って、右クリック長押しで構え、左クリックで投げる',ok:s=>s.nade>0},
+  {t:'投げ物',d:'Gで持って、左クリックで遠くへ・右クリックで近くへ（離すと投げる）',ok:s=>s.nade>0},
   {t:'武器を拾う',d:'目の前に落ちたSMGにFで持ち替えよう。倒した相手の武器も拾える',ok:s=>s.pick>0,enter:()=>{const f=fwd(),fl=Math.hypot(f[0],f[2])||1;xDropAt('smg',PL.x+f[0]/fl*2.2,groundAt(PL.x,PL.z,0.05,PL.y+1),PL.z+f[2]/fl*2.2,false);}},
   {t:'覗いて倒す',d:'右クリックで覗く（ADS）と弾がまとまる。BOTが撃ち返してくるから倒そう！',ok:s=>s.kill>0,enter:()=>{for(const id in bots)bots[id].passive=false;},tip:'頭を狙うとダメージが大きい。照準は頭の高さに置いておく'},
 ];
@@ -3765,7 +3785,7 @@ function xHints(tn){if(AS.showFps){hx.save();hx.font='800 11px system-ui,sans-se
   if(solo==='range'){hx.font='800 12px system-ui,sans-serif';hx.textAlign='center';hx.fillStyle='rgba(12,7,16,.65)';const D=X.drill,txt=D?`${DRILLS.find(d=>d[0]===D.k)[1]}　${D.dur?Math.max(0,Math.ceil((D.dur-(tn-D.t0))/1000))+'秒':''}　${D.k==='track'?Math.round(D.on/Math.max(0.1,D.tot)*100)+'%':D.k==='recoil'?D.hit+' / '+D.shot:D.hit+'ヒット'}　（Jで次のドリル）`:'J：ドリル（フリック／トラッキング／反動／ストレイフ）';const tw=hx.measureText(txt).width+24;hx.fillRect(W/2-tw/2,74,tw,24);hx.fillStyle='#ffd166';hx.fillText(txt,W/2,91);}
   if(OPTV('hints')){const w=W_();const tips=[];
     if(curW!=='knife'&&!reloading&&ammo<=Math.ceil(xMag(curW)*0.25))tips.push(`[${keyName(KB.reload)}] リロード`);
-    if(flashHeld)tips.push('右クリック長押しで構え → 左クリックで投げる');
+    if(flashHeld)tips.push('左クリック長押し→離す＝遠くへ／右クリック＝近くに転がす');
     if(X.ks)tips.push(`[${keyName(KB.ks)}] 空爆を呼ぶ`);
     if(tips.length){hx.font='800 13px system-ui,sans-serif';hx.textAlign='center';let y=H/2+120;for(const s of tips){const tw=hx.measureText(s).width+20;hx.fillStyle='rgba(12,7,16,.6)';hx.fillRect(W/2-tw/2,y-15,tw,22);hx.fillStyle='#ffd166';hx.fillText(s,W/2,y);y+=26;}}
     const since=tn-(X.startAt||tn);if(since<45000&&!X.tut){const a=since>38000?(45000-since)/7000:1;hx.globalAlpha=a*0.9;const K=[['移動','WASD'],['ダッシュ',AS.easy?'前に押すだけ':keyName(KB.sprint)],['しゃがみ／スライディング',keyName(KB.crouch)],['ジャンプ',keyName(KB.jump)],['リロード',keyName(KB.reload)],['持ち替え',keyName(KB.swap)+'・ホイール'],['投げ物',keyName(KB.flash)],['拾う・設置・蘇生',keyName(KB.use)],['スコア',keyName(KB.board)]];
