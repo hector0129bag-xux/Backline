@@ -361,6 +361,7 @@ input:focus{border-color:#8b4dff}
   <h2>サウンド</h2>
   <div class="row"><label for="vol">効果音の音量</label><span><input id="vol" type="range" min="0" max="100" step="5"><span class="rv" id="volV"></span></span></div>
   <div class="row"><label for="bgm">BGMの音量</label><span><input id="bgm" type="range" min="0" max="100" step="5"><span class="rv" id="bgmV"></span></span></div>
+  <div class="row"><span>BGMの曲</span><div class="seg" id="bgmTrk"><button data-v="neon">ネオン（標準）</button><button data-v="chill">チル</button></div></div>
   </div>
   <div><h2>画面</h2>
   <div class="row"><label for="fov">視野角（横）</label><span><input id="fov" type="range" min="80" max="115" step="1"><span class="rv" id="fovV"></span></span></div>
@@ -1527,7 +1528,39 @@ function bgmNote(t,step){const a=ac,beat=60/92,s16=beat/4,bar=Math.floor(step/16
   if(bar>=4){if(pos===0||pos===8){const o=a.createOscillator(),e=a.createGain();o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(42,t+0.18);e.gain.setValueAtTime(0.25,t);e.gain.exponentialRampToValueAtTime(0.0001,t+0.25);o.connect(e).connect(g);o.start(t);o.stop(t+0.3);}
     if(pos===4||pos===12)nz(a,t,g,0.16,'bandpass',1800,0.8,0.07,0.002);
     if(pos%2===0)nz(a,t,g,0.04,'highpass',7000,1,pos%4===2?0.035:0.02,0.001);}}
-function bgmTick(){if(!BGM.on||!ac)return;const beat=60/92,s16=beat/4;while(BGM.next<ac.currentTime+0.25){bgmNote(BGM.next,BGM.step);BGM.next+=s16;BGM.step=(BGM.step+1)%(16*8);}}
+/* 標準曲「ネオン」：暗めで前に進むシンセウェイヴ（Fm–D♭–A♭–E♭、112BPM、16小節ループ） */
+const NE={bpm:112,ch:[[53,56,60,63],[53,56,60,61],[51,56,60,63],[51,55,58,63]],root:[41,37,44,39]};
+function neVoice(a,t,dst,type,f,len,vol,lp,att,det){const o=a.createOscillator(),e=a.createGain();o.type=type;o.frequency.value=f;if(det)o.detune.value=det;let n=o;
+  if(lp){const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.setValueAtTime(lp[0],t);fl.frequency.exponentialRampToValueAtTime(lp[1],t+len*0.9);fl.Q.value=lp[2]||1;o.connect(fl);n=fl;}
+  e.gain.setValueAtTime(0.0001,t);e.gain.exponentialRampToValueAtTime(vol,t+(att||0.004));e.gain.exponentialRampToValueAtTime(0.0001,t+len);n.connect(e).connect(dst);o.start(t);o.stop(t+len+0.05);return e;}
+function neNote(t,step){const a=ac,beat=60/NE.bpm,s16=beat/4,bar=Math.floor(step/16)%16,pos=step%16,ci=Math.floor(bar/2)%4,ch=NE.ch[ci],rt=NE.root[ci],g=BGM.gain;
+  const full=bar>=4&&bar<12,brk=bar>=12,kickOn=(full||bar>=14)&&pos%4===0;
+  // パッド（2小節ごと）。キックのたびに少し沈む
+  if(pos===0&&bar%2===0){if(!BGM.pump){BGM.pump=a.createGain();BGM.pump.connect(g);BGM.pump.connect(BGM.delay);}
+    for(const n of ch)for(const det of [-9,9]){const o=a.createOscillator(),f=a.createBiquadFilter(),e=a.createGain();o.type='sawtooth';o.frequency.value=mtof(n);o.detune.value=det;
+      f.type='lowpass';f.Q.value=0.8;f.frequency.setValueAtTime(bar<4?420:700,t);f.frequency.linearRampToValueAtTime(bar<4?900:1500,t+beat*7);
+      e.gain.setValueAtTime(0.0001,t);e.gain.linearRampToValueAtTime(0.02,t+beat*1.2);e.gain.setValueAtTime(0.02,t+beat*7);e.gain.linearRampToValueAtTime(0.0001,t+beat*8);o.connect(f).connect(e).connect(BGM.pump);o.start(t);o.stop(t+beat*8+0.1);}}
+  if(kickOn&&BGM.pump){BGM.pump.gain.setValueAtTime(0.35,t);BGM.pump.gain.linearRampToValueAtTime(1,t+beat*0.7);}
+  // ベース：8分で刻む。休みの小節は伸ばす
+  if(pos%2===0&&!(brk&&bar<14&&pos>0)){const f=mtof(rt+(pos===6||pos===14?12:0)),len=brk&&bar<14?beat*3.5:s16*1.7;
+    neVoice(a,t,g,'sine',f,len,0.2,null,0.004);neVoice(a,t,g,'sawtooth',f,len,0.05,[1400,180,2],0.003);}
+  // アルペジオ（ディレイで広げる）
+  if(bar>=2){const seq=[0,1,2,3,4,3,2,1,0,2,4,5,4,2,3,1],tones=[ch[0],ch[1],ch[2],ch[3],ch[0]+12,ch[1]+12],n=tones[seq[pos]%tones.length]+12,v=bar<4?0.035:0.05;
+    const e=neVoice(a,t,g,'square',mtof(n),0.2,v,[bar<4?1400:2600,500,3],0.002);e.connect(BGM.delay);}
+  // リード：ブレイク中の短いメロディ
+  if(brk){const mel={0:[72,3],6:[75,2],10:[73,2],12:[72,4]},m=mel[pos];if(m&&bar%2===0)tone(a,t,g,'bell',mtof(m[0]),mtof(m[0]),beat*m[1]*0.5,0.07);
+    if(m&&bar%2===0){const e=neVoice(a,t,g,'sawtooth',mtof(m[0]),beat*m[1]*0.45,0.035,[3000,900,1],0.01,6);e.connect(BGM.delay);}}
+  // ドラム
+  if(kickOn){const o=a.createOscillator(),e=a.createGain();o.frequency.setValueAtTime(155,t);o.frequency.exponentialRampToValueAtTime(42,t+0.12);e.gain.setValueAtTime(0.5,t);e.gain.exponentialRampToValueAtTime(0.0001,t+0.32);o.connect(e).connect(g);o.start(t);o.stop(t+0.35);nz(a,t,g,0.01,'highpass',3000,0.7,0.08,0.0005);}
+  if((full||bar>=14)&&(pos===4||pos===12)){for(let i=0;i<3;i++)nz(a,t+i*0.009,g,0.03,'bandpass',1500,1.1,0.12,0.001);const f=nz(a,t+0.02,g,0.22,'bandpass',1200,0.8,0.07,0.004);}
+  if(full&&pos%2===1)nz(a,t,g,0.03,'highpass',8500,0.8,pos%4===3?0.03:0.018,0.0008);
+  if(full&&pos===14&&bar%4===3)nz(a,t,g,0.12,'highpass',7000,0.6,0.04,0.02);
+  // 次のループへの盛り上げ（ノイズが上がっていく）
+  if(bar===15&&pos===0){const f=nz(a,t,g,beat*4,'bandpass',400,1.5,0.06,beat*3.5);f.frequency.exponentialRampToValueAtTime(6000,t+beat*4);}
+  if(bar===3&&pos===8){const f=nz(a,t,g,beat*2,'bandpass',500,1.5,0.05,beat*1.8);f.frequency.exponentialRampToValueAtTime(5000,t+beat*2);}}
+function bgmTick(){if(!BGM.on||!ac)return;const neon=AS.bgmTrk!=='chill',beat=60/(neon?NE.bpm:92),s16=beat/4,L=neon?16*16:16*8;
+  if(BGM.trk!==(neon?'neon':'chill')){BGM.trk=neon?'neon':'chill';BGM.step=0;if(BGM.delay)BGM.delay.delayTime.value=neon?beat*0.75:0.375;}
+  while(BGM.next<ac.currentTime+0.25){(neon?neNote:bgmNote)(BGM.next,BGM.step);BGM.next+=s16;BGM.step=(BGM.step+1)%L;}}
 function bgmPlay(on){const a=actx();if(!a)return;bgmSetup();if(on===BGM.on)return;BGM.on=on;const t=a.currentTime;BGM.gain.gain.cancelScheduledValues(t);BGM.gain.gain.setValueAtTime(BGM.gain.gain.value,t);
   if(on){BGM.gain.gain.linearRampToValueAtTime(1,t+1.5);BGM.next=t+0.1;if(!BGM.timer)BGM.timer=setInterval(bgmTick,80);}else{BGM.gain.gain.linearRampToValueAtTime(0,t+1.2);}}
 
@@ -2200,7 +2233,7 @@ function renderChar(){$('myName').value=AS.name||'';
 $('myName').oninput=()=>{AS.name=$('myName').value.trim().slice(0,14);saveA();};
 function refreshSet(){xOptUI();xOptUI2();
   $('kcSet').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===(AS.killcam!==false));b.onclick=()=>{AS.killcam=b.dataset.v==='1';saveA();refreshSet();};});
-  $('gfxPost').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===postOn);b.onclick=()=>{postOn=b.dataset.v==='1';AS.post=postOn;saveA();refreshSet();};});
+  $('bgmTrk').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.v===(AS.bgmTrk==='chill'?'chill':'neon'));b.onclick=()=>{AS.bgmTrk=b.dataset.v;saveA();if(BGM.on){const t=ac.currentTime;BGM.next=t+0.15;}refreshSet();};});$('gfxPost').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===postOn);b.onclick=()=>{postOn=b.dataset.v==='1';AS.post=postOn;saveA();refreshSet();};});
   $('mmRot').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===(AS.mmRot===true));b.onclick=()=>{AS.mmRot=b.dataset.v==='1';saveA();refreshSet();};});
   $('mmSize').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',+b.dataset.v===(AS.mmSize||1));b.onclick=()=>{AS.mmSize=+b.dataset.v;saveA();refreshSet();};});
   if(AS.bgm==null)AS.bgm=45;
